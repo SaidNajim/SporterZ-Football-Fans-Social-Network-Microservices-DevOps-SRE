@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: myassineboum/sporterz-web:auth-service
+          image: mrxmoon/sporterz:auth-service
           imagePullPolicy: IfNotPresent
       restartPolicy: Always
 
