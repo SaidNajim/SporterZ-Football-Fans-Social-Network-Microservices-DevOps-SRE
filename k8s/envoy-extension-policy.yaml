@@ -1,0 +1,29 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyExtensionPolicy
+metadata:
+  name: coraza-waf-poc
+  namespace: default
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: sporterz-gateway
+  wasm:
+  - name: coraza-waf
+    rootID: ""
+    code:
+      type: Image
+      image:
+        url: ghcr.io/corazawaf/coraza-proxy-wasm:0.6.0
+    config:
+      default_directives: default
+      directives_map:
+        default:
+        - SecRuleEngine On
+        - SecDebugLogLevel 3
+        - SecRequestBodyAccess On
+        - Include @recommended-conf
+        - Include @crs-setup-conf
+        - Include @owasp_crs/*.conf
+        - SecRuleEngine On
+    failOpen: false
