@@ -6,14 +6,24 @@
   <component name="ChangeListManager">
     <list default="true" id="1251fe02-2401-48f1-b5db-a68f62fc808c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api-gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth-service/src/main/java/com/example/Auth/controllers/AuthenticationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/src/main/java/com/example/Auth/controllers/AuthenticationController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth-service/src/main/java/com/example/Auth/controllers/UsersController.java" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/src/main/java/com/example/Auth/controllers/UsersController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/grafana/alerting/1/__default__.tmpl" beforeDir="false" afterPath="$PROJECT_DIR$/grafana/alerting/1/__default__.tmpl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/grafana/grafana.db" beforeDir="false" afterPath="$PROJECT_DIR$/grafana/grafana.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/messaging-service/src/main/java/com/example/kafkamessaging/Controller/KafkaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/messaging-service/src/main/java/com/example/kafkamessaging/Controller/KafkaController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nginx.conf" beforeDir="false" afterPath="$PROJECT_DIR$/nginx.conf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/api-gateway.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/api-gateway.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/auth-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/auth-service.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/frontend.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/frontend.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/match-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/match-service.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/posts-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/posts-service.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/match-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/match-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/match-service/src/main/java/com/example/matchservice/Service/FootballApi.java" beforeDir="false" afterPath="$PROJECT_DIR$/match-service/src/main/java/com/example/matchservice/Service/FootballApi.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/messaging-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/messaging-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/messaging-service/src/main/java/com/example/kafkamessaging/KafkaMessagingApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/messaging-service/src/main/java/com/example/kafkamessaging/KafkaMessagingApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/messaging-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/messaging-service/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/messaging-service/src/test/java/com/example/kafkamessaging/KafkaMessagingApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/messaging-service/src/test/java/com/example/kafkamessaging/KafkaMessagingApplicationTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/posts-service/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/posts-service/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/posts-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/posts-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prometheus/prometheus.yml" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -77,64 +87,65 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "Docker.docker-compose.yml.api-gateway: Compose Deployment.executor": "Run",
-    "Docker.docker-compose.yml.auth-service: Compose Deployment.executor": "Run",
-    "Docker.docker-compose.yml.frontend: Compose Deployment.executor": "Run",
-    "Docker.docker-compose.yml.nginx: Compose Deployment.executor": "Run",
-    "Docker.docker-compose.yml: Compose Deployment.executor": "Run",
-    "HTTP Request.mvn_multi-endpoints | #1.executor": "Run",
-    "HTTP Request.mvn_multi-endpoints_2 | #1.executor": "Run",
-    "HTTP Request.mvn_multi-endpoints_3 | #1.executor": "Run",
-    "HTTP Request.mvn_multi-endpoints_4 | #1.executor": "Run",
-    "HTTP Request.mvn_multi-endpoints_5 | #1.executor": "Run",
-    "HTTP Request.mvn_multi-endpoints_6 | #1.executor": "Run",
-    "Maven.api-gateway [clean].executor": "Run",
-    "Maven.api-gateway [deploy].executor": "Run",
-    "Maven.api-gateway [install].executor": "Run",
-    "Maven.auth-service [clean].executor": "Run",
-    "Maven.auth-service [deploy].executor": "Run",
-    "Maven.match-service [clean].executor": "Run",
-    "Maven.match-service [deploy].executor": "Run",
-    "Maven.messaging-service [clean].executor": "Run",
-    "Maven.messaging-service [deploy].executor": "Run",
-    "Maven.messaging-service [install].executor": "Run",
-    "Maven.messaging-service [package].executor": "Run",
-    "Maven.posts-service [clean].executor": "Run",
-    "Maven.posts-service [deploy].executor": "Run",
-    "Maven.sporterz-services [clean].executor": "Run",
-    "Maven.sporterz-services [install].executor": "Run",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Spring Boot.ApiGatewayApplication.executor": "Run",
-    "Spring Boot.AuthApplication.executor": "Run",
-    "Spring Boot.KafkaMessagingApplication.executor": "Run",
-    "Spring Boot.MatchServiceApplication.executor": "Run",
-    "Spring Boot.PostsServiceApplication.executor": "Run",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "mvn-multimodules",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/ilyas/Desktop/Sporterz/mvn-multi/k8s",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "run.configurations.included.in.services": "true",
-    "settings.editor.selected.configurable": "preferences.keymap",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;Docker.docker-compose.yml.api-gateway: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose.yml.auth-service: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose.yml.frontend: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose.yml.nginx: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose.yml: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.mvn_multi-endpoints | #1.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.mvn_multi-endpoints_2 | #1.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.mvn_multi-endpoints_3 | #1.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.mvn_multi-endpoints_4 | #1.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.mvn_multi-endpoints_5 | #1.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.mvn_multi-endpoints_6 | #1.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.api-gateway [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.api-gateway [deploy].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.api-gateway [install].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.auth-service [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.auth-service [deploy].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.match-service [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.match-service [deploy].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.messaging-service [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.messaging-service [deploy].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.messaging-service [install].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.messaging-service [package].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.posts-service [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.posts-service [deploy].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.sporterz-services [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.sporterz-services [install].executor&quot;: &quot;Run&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Spring Boot.ApiGatewayApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.AuthApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.KafkaMessagingApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.MatchServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.PostsServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Dell XPS/Documents/GitHub/SporterZ-DevOps-SRE&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;spring.configuration.checksum&quot;: &quot;250c6d26e84c90dd5bc88f72e08b7776&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\ilyas\Desktop\Sporterz\mvn-multi\k8s" />
@@ -255,6 +266,8 @@
       <workItem from="1716551608291" duration="9776000" />
       <workItem from="1716650381938" duration="8253000" />
       <workItem from="1716739735596" duration="19178000" />
+      <workItem from="1777200152630" duration="6860000" />
+      <workItem from="1777331009627" duration="1393000" />
     </task>
     <servers />
   </component>
@@ -269,12 +282,12 @@
             <list>
               <RecentGroup>
                 <option name="FILTER_VALUES">
-                  <option value="Mohammed-Yassine BOUMEHDI" />
+                  <option value="Said NAJIM" />
                 </option>
               </RecentGroup>
               <RecentGroup>
                 <option name="FILTER_VALUES">
-                  <option value="Said NAJIM" />
+                  <option value="Mohammed-Yassine BOUMEHDI" />
                 </option>
               </RecentGroup>
               <RecentGroup>
@@ -297,7 +310,7 @@
                   <entry key="user">
                     <value>
                       <list>
-                        <option value="Mohammed-Yassine BOUMEHDI" />
+                        <option value="Said NAJIM" />
                       </list>
                     </value>
                   </entry>
