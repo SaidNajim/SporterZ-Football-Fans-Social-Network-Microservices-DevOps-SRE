@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: messaging-service
+  labels:
+    app: messaging-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: messaging-service
+  template:
+    metadata:
+      labels:
+        app: messaging-service
+    spec:
+      containers:
+        - name: messaging-service
+          image: mrxmoon/sporterz-messaging-service:latest
+          ports:
+            - containerPort: 8083
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "my-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: messaging-service
+spec:
+  type: ClusterIP
+  selector:
+    app: messaging-service
+  ports:
+    - protocol: TCP
+      port: 8083
+      targetPort: 8083
