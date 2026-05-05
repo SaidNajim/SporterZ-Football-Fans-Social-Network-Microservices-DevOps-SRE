@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: myassineboum/sporterz-web:frontend
+        image: mrxmoon/sporterz-frontend:latest
         ports:
         - containerPort: 4200
 ---
@@ -25,27 +25,10 @@ kind: Service
 metadata:
   name: frontend
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: frontend
   ports:
   - protocol: TCP
     port: 4200
     targetPort: 4200
-# ---
-# apiVersion: networking.k8s.io/v1
-# kind: Ingress
-# metadata:
-#   name: sporterz-front-ingress
-# spec:
-#   rules:
-#   - http:
-#       paths:
-#       - pathType: Prefix
-#         path: /
-#         backend:
-#           service:
-#             name: frontend
-#             port:
-#               number: 4200
-

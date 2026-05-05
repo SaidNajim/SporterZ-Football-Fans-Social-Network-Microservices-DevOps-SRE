@@ -16,9 +16,12 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: mrxmoon/sporterz:api-gateway
+          image: mrxmoon/sporterz-api-gateway:latest
           ports:
             - containerPort: 8888
+              name: http
+            - containerPort: 9090
+              name: management
 ---
 apiVersion: v1
 kind: Service
@@ -32,23 +35,8 @@ spec:
     - protocol: TCP
       port: 8888
       targetPort: 8888
----
-# The HTTPRoute - Replaces the 'rules' section of Ingress
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: api-gateway-route
-  namespace: default
-spec:
-  hostnames:
-  - localhost
-  parentRefs:
-  - name: sporterz-gateway
-  rules:
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /
-    backendRefs:
-    - name: api-gateway
-      port: 8888
+      name: http
+    - protocol: TCP
+      port: 9090
+      targetPort: 9090
+      name: management
