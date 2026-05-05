@@ -1,60 +1,48 @@
 spring:
   application:
-    name:
-      api-gateway
+    name: api-gateway
   cloud:
     discovery:
       enabled: false
     gateway:
-        routes:
-### k8s config :
-          - id: messaging-service
-            uri: http://messaging-service:8083
-            predicates:
-              - Path=/api/kafka/**
-          - id: match-service
-            uri: http://match-service:8082
-            predicates:
-              - Path=/match-service/**
-          - id: auth-service
-            uri: http://auth-service:8085
-            predicates:
-              - Path=/api/auth/**
-          - id: posts-service
-            uri: http://posts-service:8081
-            predicates:
-              - Path=/api/posts/**
-          - id: angular
-            uri: http://frontend:4200
-            predicates:
-              - Path=/**
-### Local config :
-#          - id: messaging-service
-#            uri: http://localhost:8083
-#            predicates:
-#              - Path=/api/kafka/**
-#          - id: match-service
-#            uri: http://localhost:8082
-#            predicates:
-#              - Path=/match-service/**
-#          - id: auth-service
-#            uri: http://localhost:8085
-#            predicates:
-#              - Path=/api/auth/**
-#          - id: posts-service
-#            uri: http://localhost:8081
-#            predicates:
-#              - Path=/api/posts/**
-#          - id: angular
-#            uri: http://localhost:4200
-#            predicates:
-#              - Path=/**
-        globalcors:
-          corsConfigurations:
-            '[/**]':
-              allowedOrigins: "*"
-              allowedHeaders: "*"
-              allowedMethods: "*"
+      routes:
+        - id: messaging-service
+          uri: http://messaging-service:8083
+          predicates:
+            - Path=/api/kafka/**
+        - id: match-service
+          uri: http://match-service:8082
+          predicates:
+            - Path=/match-service/**
+        - id: auth-service
+          uri: http://auth-service:8085
+          predicates:
+            - Path=/api/auth/**
+        - id: posts-service
+          uri: http://posts-service:8081
+          predicates:
+            - Path=/api/posts/**
+        - id: angular
+          uri: http://frontend:4200
+          predicates:
+            - Path=/**
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedHeaders: "*"
+            allowedMethods: "*"
 
 server:
   port: 8888
+
+management:
+  server:
+    port: 9090
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, health, info
+  endpoint:
+    health:
+      show-details: always
