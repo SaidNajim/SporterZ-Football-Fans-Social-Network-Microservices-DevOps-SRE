@@ -26,4 +26,5 @@ spec:
         - Include @crs-setup-conf
         - Include @owasp_crs/*.conf
         - SecRuleEngine On
+        - SecResponseBodyAccess Off
     failOpen: false
