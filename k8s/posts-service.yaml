@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: posts-service
-          image: myassineboum/sporterz-web:posts-service
+          image: mrxmoon/sporterz-posts-service:latest
           ports:
             - containerPort: 8081
 ---

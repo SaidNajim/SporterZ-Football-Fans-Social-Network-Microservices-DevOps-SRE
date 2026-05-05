@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: match-service
-        image: myassineboum/sporterz-web:match-service
+        image: mrxmoon/sporterz-match-service:latest
         ports:
         - containerPort: 8082
 ---

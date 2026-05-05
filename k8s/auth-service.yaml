@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: mrxmoon/sporterz:auth-service
+          image: mrxmoon/sporterz-auth-service:latest
           imagePullPolicy: IfNotPresent
       restartPolicy: Always
 
