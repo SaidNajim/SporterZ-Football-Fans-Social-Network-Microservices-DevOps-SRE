@@ -26,6 +26,8 @@
 - Gateway and security:
   - Envoy Gateway (`k8s/envoy-gateway.yaml`)
   - Coraza WAF policy (`k8s/envoy-extension-policy.yaml`)
+- Argo CD GitOps bootstrap:
+  - Project + ApplicationSet
 - Docker image automation script: `build-and-push.sh`
 
 ---
@@ -58,7 +60,7 @@ From repository root:
 # 1) Build and push backend images (includes Maven build)
 ./build-and-push.sh --build
 
-# 2) Deploy everything (cluster + services + gateway + monitoring)
+# 2) Deploy everything (cluster + services + gateway + monitoring + Argo CD)
 cd k8s
 ./deploy.sh
 
@@ -126,7 +128,9 @@ What `deploy.sh` does:
 6. Applies Envoy Gateway route and Coraza WAF policy
 7. Pins Envoy data plane service to NodePort `30080`
 8. Deploys Prometheus + Grafana
-9. Waits for main workloads rollout
+9. Installs/updates Argo CD in `argocd` namespace
+10. Applies `AppProject` + `ApplicationSet` linked to this repository
+11. Waits for main workloads rollout
 
 ### Deployment toggles
 
@@ -135,13 +139,14 @@ You can enable/disable parts with environment variables:
 - `DEPLOY_KAFKA=true|false`
 - `DEPLOY_MESSAGING=true|false`
 - `DEPLOY_ENVOY_WAF=true|false`
+- `DEPLOY_ARGOCD=true|false`
 - `ENVOY_NODEPORT=<port>` (default `30080`)
 
 Examples:
 
 ```bash
 # Full stack (default behavior)
-DEPLOY_KAFKA=true DEPLOY_MESSAGING=true DEPLOY_ENVOY_WAF=true ./deploy.sh
+DEPLOY_KAFKA=true DEPLOY_MESSAGING=true DEPLOY_ENVOY_WAF=true DEPLOY_ARGOCD=true ./deploy.sh
 
 # Without Kafka + messaging
 DEPLOY_KAFKA=false DEPLOY_MESSAGING=false ./deploy.sh
@@ -153,8 +158,22 @@ PowerShell equivalent (when launching bash from PowerShell):
 $env:DEPLOY_KAFKA="true"
 $env:DEPLOY_MESSAGING="true"
 $env:DEPLOY_ENVOY_WAF="true"
+$env:DEPLOY_ARGOCD="true"
 bash ./deploy.sh
 ```
+
+### Argo CD install command used by `deploy.sh`
+
+```bash
+kubectl apply -n argocd --server-side --force-conflicts -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+```
+
+### Argo CD ApplicationSet (GitOps source)
+
+- Repository URL: `https://github.com/SaidNajim/SporterZ-Football-Fans-Social-Network-Microservices-DevOps-SRE`
+- ApplicationSet manifest: `applicationset-sporterz.yaml`
+- Generated applications target selected manifests under `k8s/*.yaml`
+- When `DEPLOY_ARGOCD=true`, Argo CD reconciliation can re-apply managed resources even if some `DEPLOY_*` toggles are `false` in `deploy.sh`
 
 ## 4) Verify deployment
 
@@ -172,6 +191,8 @@ kubectl get svc
 kubectl get gateway sporterz-gateway
 kubectl get httproute api-gateway-route
 kubectl get envoyextensionpolicy coraza-waf-poc
+kubectl get applicationsets -n argocd
+kubectl get applications -n argocd
 ```
 
 ---
@@ -293,6 +314,11 @@ Monitoring:
 - `k8s/prometheus.yaml`
 - `k8s/grafana.yaml`
 
+Argo CD:
+
+- `k8s/project-sporterz.yaml`
+- `k8s/applicationset-sporterz.yaml`
+
 Cluster config:
 
 - `k8s/cluster-config.yaml`
@@ -316,6 +342,10 @@ Operational scripts:
 cd k8s
 ./deploy.sh
 ./status.sh
+
+# Argo CD checks
+kubectl get applicationsets -n argocd
+kubectl get applications -n argocd
 
 # App
 start http://localhost/   # Windows

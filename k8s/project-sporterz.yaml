@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: sporterz
+  namespace: argocd
+spec:
+  description: GitOps project for SporterZ manifests
+  sourceRepos:
+    - https://github.com/SaidNajim/SporterZ-Football-Fans-Social-Network-Microservices-DevOps-SRE
+  destinations:
+    - namespace: "*"
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"

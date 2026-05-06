@@ -16,9 +16,12 @@ NC='\033[0m'
 DEPLOY_KAFKA="${DEPLOY_KAFKA:-true}"
 DEPLOY_MESSAGING="${DEPLOY_MESSAGING:-true}"
 DEPLOY_ENVOY_WAF="${DEPLOY_ENVOY_WAF:-true}"
+DEPLOY_ARGOCD="${DEPLOY_ARGOCD:-true}"
 ENVOY_INSTALL_URL="${ENVOY_INSTALL_URL:-https://github.com/envoyproxy/gateway/releases/download/v1.2.0/install.yaml}"
 ENVOY_GATEWAY_API_URL="${ENVOY_GATEWAY_API_URL:-https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.0.0/standard-install.yaml}"
 ENVOY_NODEPORT="${ENVOY_NODEPORT:-30080}"
+ARGOCD_NAMESPACE="${ARGOCD_NAMESPACE:-argocd}"
+ARGOCD_INSTALL_URL="${ARGOCD_INSTALL_URL:-https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml}"
 
 wait_rollout() {
   local deployment="$1"
@@ -50,6 +53,28 @@ configure_envoy_nodeport() {
   rm -f "${merge_patch_file}" "${json_patch_file}"
 
   echo -e "${GREEN}Envoy service ${svc} is pinned to NodePort ${ENVOY_NODEPORT}${NC}"
+}
+
+bootstrap_argocd() {
+  if [[ "${DEPLOY_KAFKA}" != "true" || "${DEPLOY_MESSAGING}" != "true" || "${DEPLOY_ENVOY_WAF}" != "true" ]]; then
+    echo -e "${YELLOW}Note: Argo CD ApplicationSet manages the full stack manifests and may reconcile resources even when DEPLOY_* toggles are set to false.${NC}"
+  fi
+
+  echo -e "${YELLOW}Installing/updating Argo CD in namespace ${ARGOCD_NAMESPACE}...${NC}"
+  kubectl create namespace "${ARGOCD_NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+  kubectl apply -n "${ARGOCD_NAMESPACE}" --server-side --force-conflicts -f "${ARGOCD_INSTALL_URL}" >/dev/null
+
+  kubectl get crd applications.argoproj.io >/dev/null
+  kubectl get crd applicationsets.argoproj.io >/dev/null
+  kubectl get crd appprojects.argoproj.io >/dev/null
+
+  kubectl rollout status deployment/argocd-server -n "${ARGOCD_NAMESPACE}" --timeout=240s || true
+  kubectl rollout status statefulset/argocd-application-controller -n "${ARGOCD_NAMESPACE}" --timeout=240s || true
+  kubectl rollout status deployment/argocd-applicationset-controller -n "${ARGOCD_NAMESPACE}" --timeout=240s || true
+
+  echo -e "${YELLOW}Applying Argo CD AppProject + ApplicationSet...${NC}"
+  kubectl apply -f project-sporterz.yaml
+  kubectl apply -f applicationset-sporterz.yaml
 }
 
 echo -e "${YELLOW}Checking kind cluster...${NC}"
@@ -116,6 +141,12 @@ kubectl apply -f prometheus-config.yaml
 kubectl apply -f prometheus.yaml
 kubectl apply -f grafana.yaml
 
+if [[ "${DEPLOY_ARGOCD}" == "true" ]]; then
+  bootstrap_argocd
+else
+  echo -e "${YELLOW}Skipping Argo CD bootstrap (DEPLOY_ARGOCD=${DEPLOY_ARGOCD})${NC}"
+fi
+
 echo -e "${YELLOW}Waiting for primary deployments...${NC}"
 wait_rollout "auth-service"
 wait_rollout "posts-service"
@@ -142,8 +173,10 @@ echo "Useful checks:"
 echo "  - kubectl get svc -n envoy-gateway-system"
 echo "  - kubectl get envoyextensionpolicy coraza-waf-poc"
 echo "  - kubectl get pods"
+echo "  - kubectl get applicationsets -n argocd"
+echo "  - kubectl get applications -n argocd"
 echo "  - kubectl logs -l app=api-gateway --tail=100"
-echo "  - DEPLOY_KAFKA=true DEPLOY_MESSAGING=true DEPLOY_ENVOY_WAF=true ./deploy.sh"
+echo "  - DEPLOY_KAFKA=true DEPLOY_MESSAGING=true DEPLOY_ENVOY_WAF=true DEPLOY_ARGOCD=true ./deploy.sh"
 echo ""
 echo "Monitoring:"
 echo "  - Prometheus: kubectl port-forward svc/prometheus 9090:9090"

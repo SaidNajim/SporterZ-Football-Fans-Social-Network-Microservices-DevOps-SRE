@@ -28,6 +28,16 @@ kubectl get envoyextensionpolicy coraza-waf-poc 2>/dev/null || echo "   coraza-w
 kubectl get svc -n envoy-gateway-system -l gateway.envoyproxy.io/owning-gateway-name=sporterz-gateway -o wide 2>/dev/null || echo "   envoy data-plane service not found"
 
 echo ""
+echo "Argo CD:"
+if kubectl get namespace argocd >/dev/null 2>&1; then
+    kubectl get pods -n argocd
+    kubectl get applicationsets.argoproj.io -n argocd 2>/dev/null || echo "   no ApplicationSets found"
+    kubectl get applications.argoproj.io -n argocd 2>/dev/null || echo "   no Applications found"
+else
+    echo "   argocd namespace not found"
+fi
+
+echo ""
 echo "Persistent Volumes:"
 kubectl get pvc 2>/dev/null || echo "   No PVCs found"
 

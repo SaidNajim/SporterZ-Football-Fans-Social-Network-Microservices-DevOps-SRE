@@ -14,6 +14,8 @@ read -p "Delete Kubernetes resources? (y/N): " confirm
 if [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]]; then
     echo "Deleting resources..."
 
+    kubectl delete -f applicationset-sporterz.yaml --ignore-not-found=true
+    kubectl delete -f project-sporterz.yaml --ignore-not-found=true
     kubectl delete -f frontend.yaml --ignore-not-found=true
     kubectl delete -f api-gateway.yaml --ignore-not-found=true
     kubectl delete -f messaging-service.yaml --ignore-not-found=true
@@ -28,6 +30,14 @@ if [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]]; then
     kubectl delete -f grafana.yaml --ignore-not-found=true
 
     echo "All resources deleted!"
+fi
+
+echo ""
+read -p "Delete Argo CD namespace 'argocd'? (y/N): " delete_argocd
+
+if [[ $delete_argocd == [yY] || $delete_argocd == [yY][eE][sS] ]]; then
+    echo "Deleting Argo CD namespace..."
+    kubectl delete namespace argocd --ignore-not-found=true
 fi
 
 echo ""

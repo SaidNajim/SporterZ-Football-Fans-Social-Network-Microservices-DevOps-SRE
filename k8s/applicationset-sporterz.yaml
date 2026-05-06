@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: sporterz-applicationset
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+    - list:
+        elements:
+          - appName: core
+            namespace: default
+            include: "{auth-service.yaml,posts-service.yaml,match-service.yaml,messaging-service.yaml,api-gateway.yaml,frontend.yaml}"
+          - appName: gateway
+            namespace: default
+            include: "{envoy-gateway.yaml,envoy-extension-policy.yaml}"
+          - appName: kafka
+            namespace: kafka
+            include: "kafka-single-node.yaml"
+          - appName: monitoring
+            namespace: default
+            include: "{prometheus-config.yaml,prometheus.yaml,grafana.yaml}"
+  template:
+    metadata:
+      name: sporterz-{{.appName}}
+      labels:
+        app.kubernetes.io/part-of: sporterz
+    spec:
+      project: sporterz
+      source:
+        repoURL: https://github.com/SaidNajim/SporterZ-Football-Fans-Social-Network-Microservices-DevOps-SRE
+        targetRevision: main
+        path: k8s
+        directory:
+          recurse: false
+          include: "{{.include}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{.namespace}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
+          - SkipDryRunOnMissingResource=true
