@@ -16,10 +16,13 @@ NC='\033[0m'
 DEPLOY_KAFKA="${DEPLOY_KAFKA:-true}"
 DEPLOY_MESSAGING="${DEPLOY_MESSAGING:-true}"
 DEPLOY_ENVOY_WAF="${DEPLOY_ENVOY_WAF:-true}"
+DEPLOY_KYVERNO="${DEPLOY_KYVERNO:-true}"
 DEPLOY_ARGOCD="${DEPLOY_ARGOCD:-true}"
 ENVOY_INSTALL_URL="${ENVOY_INSTALL_URL:-https://github.com/envoyproxy/gateway/releases/download/v1.2.0/install.yaml}"
 ENVOY_GATEWAY_API_URL="${ENVOY_GATEWAY_API_URL:-https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.0.0/standard-install.yaml}"
 ENVOY_NODEPORT="${ENVOY_NODEPORT:-30080}"
+KYVERNO_NAMESPACE="${KYVERNO_NAMESPACE:-kyverno}"
+KYVERNO_INSTALL_URL="${KYVERNO_INSTALL_URL:-https://github.com/kyverno/kyverno/releases/latest/download/install.yaml}"
 ARGOCD_NAMESPACE="${ARGOCD_NAMESPACE:-argocd}"
 ARGOCD_INSTALL_URL="${ARGOCD_INSTALL_URL:-https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml}"
 
@@ -75,6 +78,22 @@ bootstrap_argocd() {
   echo -e "${YELLOW}Applying Argo CD AppProject + ApplicationSet...${NC}"
   kubectl apply -f project-sporterz.yaml
   kubectl apply -f applicationset-sporterz.yaml
+}
+
+bootstrap_kyverno() {
+  echo -e "${YELLOW}Installing/updating Kyverno in namespace ${KYVERNO_NAMESPACE}...${NC}"
+  kubectl create namespace "${KYVERNO_NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+
+  if ! kubectl get crd clusterpolicies.kyverno.io >/dev/null 2>&1 || \
+     ! kubectl get deployment -n "${KYVERNO_NAMESPACE}" kyverno-admission-controller >/dev/null 2>&1; then
+    kubectl apply -f "${KYVERNO_INSTALL_URL}" >/dev/null
+  fi
+
+  kubectl get crd clusterpolicies.kyverno.io >/dev/null
+  kubectl rollout status deployment/kyverno-admission-controller -n "${KYVERNO_NAMESPACE}" --timeout=240s || true
+
+  echo -e "${YELLOW}Applying Kyverno signed-image policy...${NC}"
+  kubectl apply -f kyverno-verify-signed-images.yaml
 }
 
 echo -e "${YELLOW}Checking kind cluster...${NC}"
@@ -136,6 +155,12 @@ else
   echo -e "${YELLOW}Skipping Envoy/WAF install (DEPLOY_ENVOY_WAF=${DEPLOY_ENVOY_WAF})${NC}"
 fi
 
+if [[ "${DEPLOY_KYVERNO}" == "true" ]]; then
+  bootstrap_kyverno
+else
+  echo -e "${YELLOW}Skipping Kyverno install (DEPLOY_KYVERNO=${DEPLOY_KYVERNO})${NC}"
+fi
+
 echo -e "${YELLOW}Applying monitoring stack...${NC}"
 kubectl apply -f prometheus-config.yaml
 kubectl apply -f prometheus.yaml
@@ -172,11 +197,13 @@ echo ""
 echo "Useful checks:"
 echo "  - kubectl get svc -n envoy-gateway-system"
 echo "  - kubectl get envoyextensionpolicy coraza-waf-poc"
+echo "  - kubectl get clusterpolicy verify-signed-sporterz-images"
+echo "  - kubectl get pods -n ${KYVERNO_NAMESPACE}"
 echo "  - kubectl get pods"
 echo "  - kubectl get applicationsets -n argocd"
 echo "  - kubectl get applications -n argocd"
 echo "  - kubectl logs -l app=api-gateway --tail=100"
-echo "  - DEPLOY_KAFKA=true DEPLOY_MESSAGING=true DEPLOY_ENVOY_WAF=true DEPLOY_ARGOCD=true ./deploy.sh"
+echo "  - DEPLOY_KAFKA=true DEPLOY_MESSAGING=true DEPLOY_ENVOY_WAF=true DEPLOY_KYVERNO=true DEPLOY_ARGOCD=true ./deploy.sh"
 echo ""
 echo "Monitoring:"
 echo "  - Prometheus: kubectl port-forward svc/prometheus 9090:9090"

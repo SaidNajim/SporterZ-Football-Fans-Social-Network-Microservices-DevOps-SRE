@@ -28,6 +28,15 @@ kubectl get envoyextensionpolicy coraza-waf-poc 2>/dev/null || echo "   coraza-w
 kubectl get svc -n envoy-gateway-system -l gateway.envoyproxy.io/owning-gateway-name=sporterz-gateway -o wide 2>/dev/null || echo "   envoy data-plane service not found"
 
 echo ""
+echo "Kyverno:"
+kubectl get clusterpolicy verify-signed-sporterz-images 2>/dev/null || echo "   verify-signed-sporterz-images policy not found"
+if kubectl get namespace kyverno >/dev/null 2>&1; then
+    kubectl get pods -n kyverno
+else
+    echo "   kyverno namespace not found"
+fi
+
+echo ""
 echo "Argo CD:"
 if kubectl get namespace argocd >/dev/null 2>&1; then
     kubectl get pods -n argocd

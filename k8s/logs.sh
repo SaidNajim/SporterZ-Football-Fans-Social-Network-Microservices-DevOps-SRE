@@ -19,6 +19,7 @@ if [ -z "$SERVICE" ]; then
     echo "  api-gateway"
     echo "  frontend"
     echo "  kafka"
+    echo "  kyverno"
     exit 1
 fi
 
@@ -43,6 +44,11 @@ case $SERVICE in
         ;;
     kafka)
         LABEL="app=kafka"
+        ;;
+    kyverno)
+        echo "Showing logs for kyverno-admission-controller (follow mode, Ctrl+C to exit)..."
+        kubectl logs -f -n kyverno deploy/kyverno-admission-controller --tail=100
+        exit 0
         ;;
     *)
         echo "Unknown service: $SERVICE"
