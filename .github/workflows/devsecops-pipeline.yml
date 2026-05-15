@@ -83,6 +83,7 @@ jobs:
     with:
       module: auth-service
       port:   8085
+    secrets: inherit  # pragma: allowlist secret
 
   dast-api-gateway:
     needs: [detect-changes, build-test]
@@ -91,6 +92,7 @@ jobs:
     with:
       module: api-gateway
       port:   8888
+    secrets: inherit  # pragma: allowlist secret
 
   dast-posts-service:
     needs: [detect-changes, build-test]
@@ -99,6 +101,7 @@ jobs:
     with:
       module: posts-service
       port:   8081
+    secrets: inherit  # pragma: allowlist secret
 
   dast-match-service:
     needs: [detect-changes, build-test]
@@ -107,6 +110,7 @@ jobs:
     with:
       module: match-service
       port:   8082
+    secrets: inherit  # pragma: allowlist secret
 
   dast-messaging-service:
     needs: [detect-changes, build-test]
@@ -115,6 +119,7 @@ jobs:
     with:
       module: messaging-service
       port:   8083
+    secrets: inherit  # pragma: allowlist secret
 
   # Snyk repo-wide scans
   snyk-security:

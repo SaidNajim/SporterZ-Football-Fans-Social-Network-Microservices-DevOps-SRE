@@ -15,6 +15,13 @@ on:
         required: false
         type: string
         default: "17"
+    secrets:
+      POSTS_DB_URL:
+        required: false
+      MATCH_DB_URL:
+        required: false
+      APISPORTS_KEY:
+        required: false
 
 permissions:
   contents: read
@@ -35,6 +42,10 @@ jobs:
         with:
           name: service-jars
       - name: Start ${{ inputs.module }}
+        env:
+          POSTS_DB_URL: ${{ secrets.POSTS_DB_URL }}
+          MATCH_DB_URL: ${{ secrets.MATCH_DB_URL }}
+          APISPORTS_KEY: ${{ secrets.APISPORTS_KEY }}
         run: |
           mkdir -p reports
           nohup java -jar ${{ inputs.module }}/target/${{ inputs.module }}-*.jar \
