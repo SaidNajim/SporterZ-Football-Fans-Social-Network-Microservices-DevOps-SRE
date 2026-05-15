@@ -10,7 +10,7 @@
 - **Password hashing in the `.properties` file.**
 - **Hashing user passwords.**
 - **Allow the application to work with any relational database.**
-  
+
 ### Your Report
 
 Your report will serve as your README, containing the usual elements of a report (such as the names and contact information of team members, a table of contents, etc.).
