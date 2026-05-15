@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: match-service
+  namespace: default
   labels:
     app: match-service
 spec:
@@ -16,7 +17,7 @@ spec:
     spec:
       containers:
       - name: match-service
-        image: mrxmoon/sporterz-match-service:latest
+        image: mrxmoon/sporterz-match-service:main  # Placeholder - ArgoCD Image Updater will set to commit SHA
         ports:
         - containerPort: 8082
 ---
@@ -32,4 +33,3 @@ spec:
   - protocol: TCP
     port: 8082
     targetPort: 8082
-

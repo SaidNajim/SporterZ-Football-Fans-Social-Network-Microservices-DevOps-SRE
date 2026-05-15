@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: auth-service
+  namespace: default
   labels:
     app: auth-service
 spec:
@@ -16,7 +17,7 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: mrxmoon/sporterz-auth-service:latest
+          image: mrxmoon/sporterz-auth-service:main  # Placeholder - ArgoCD Image Updater will set to commit SHA
           imagePullPolicy: IfNotPresent
       restartPolicy: Always
 

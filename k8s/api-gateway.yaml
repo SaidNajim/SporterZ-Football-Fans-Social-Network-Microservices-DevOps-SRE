@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api-gateway
+  namespace: default
   labels:
     app: api-gateway
 spec:
@@ -16,7 +17,7 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: mrxmoon/sporterz-api-gateway:latest
+          image: mrxmoon/sporterz-api-gateway:main  # Placeholder - ArgoCD Image Updater will set to commit SHA
           ports:
             - containerPort: 8888
               name: http

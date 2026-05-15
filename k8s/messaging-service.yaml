@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: messaging-service
+  namespace: default
   labels:
     app: messaging-service
 spec:
@@ -16,7 +17,7 @@ spec:
     spec:
       containers:
         - name: messaging-service
-          image: mrxmoon/sporterz-messaging-service:latest
+          image: mrxmoon/sporterz-messaging-service:main  # Placeholder - ArgoCD Image Updater will set to commit SHA
           ports:
             - containerPort: 8083
           env:

@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: posts-service
+  namespace: default
   labels:
     app: posts-service
 spec:
@@ -16,7 +17,7 @@ spec:
     spec:
       containers:
         - name: posts-service
-          image: mrxmoon/sporterz-posts-service:latest
+          image: mrxmoon/sporterz-posts-service:main  # Placeholder - ArgoCD Image Updater will set to commit SHA
           ports:
             - containerPort: 8081
 ---
