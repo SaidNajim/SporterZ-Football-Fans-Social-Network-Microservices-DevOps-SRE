@@ -17,7 +17,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "10040A2526072B667C02EE4AE6A75D115E7F7E02573892D5BD3C4A9E9B2B4C3AFF868172859CFC44B72360563C8BA66D";
+    private static final String SECRET_KEY = "10040A2526072B667C02EE4AE6A75D115E7F7E02573892D5BD3C4A9E9B2B4C3AFF868172859CFC44B72360563C8BA66D"; // pragma: allowlist secret
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
