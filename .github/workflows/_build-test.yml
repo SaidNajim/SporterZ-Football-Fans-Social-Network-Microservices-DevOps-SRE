@@ -1,0 +1,29 @@
+name: Build and Unit Tests
+
+on:
+  workflow_call:
+    inputs:
+      java-version:
+        required: false
+        type: string
+        default: "17"
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ inputs.java-version }}
+          cache: maven
+      - run: mvn -B -ntp clean verify
+      - uses: actions/upload-artifact@v4
+        with:
+          name: service-jars
+          path: "*/target/*.jar"
+          if-no-files-found: warn

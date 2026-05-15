@@ -75,6 +75,10 @@ bootstrap_argocd() {
   kubectl rollout status statefulset/argocd-application-controller -n "${ARGOCD_NAMESPACE}" --timeout=240s || true
   kubectl rollout status deployment/argocd-applicationset-controller -n "${ARGOCD_NAMESPACE}" --timeout=240s || true
 
+  echo -e "${YELLOW}Installing Argo CD Image Updater...${NC}"
+  kubectl apply -n "${ARGOCD_NAMESPACE}" -f https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/stable/manifests/install.yaml >/dev/null
+  kubectl rollout status deployment/argocd-image-updater -n "${ARGOCD_NAMESPACE}" --timeout=120s || true
+
   echo -e "${YELLOW}Applying Argo CD AppProject + ApplicationSet...${NC}"
   kubectl apply -f project-sporterz.yaml
   kubectl apply -f applicationset-sporterz.yaml
@@ -92,8 +96,7 @@ bootstrap_kyverno() {
   kubectl get crd clusterpolicies.kyverno.io >/dev/null
   kubectl rollout status deployment/kyverno-admission-controller -n "${KYVERNO_NAMESPACE}" --timeout=240s || true
 
-  echo -e "${YELLOW}Applying Kyverno signed-image policy...${NC}"
-  kubectl apply -f kyverno-verify-signed-images.yaml
+  echo -e "${YELLOW}Kyverno policy is managed by ArgoCD (security-overlay)...${NC}"
 }
 
 echo -e "${YELLOW}Checking kind cluster...${NC}"

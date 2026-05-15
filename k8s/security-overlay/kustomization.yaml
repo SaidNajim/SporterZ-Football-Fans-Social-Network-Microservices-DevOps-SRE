@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - kyverno-verify-signed-images.yaml
+
+# Generates the cosign-public-key Secret read by the Kyverno policy.
+# Single source of truth for the key: security/keys/cosign.pub
+# Apply with: kubectl apply -k k8s/security-overlay --load-restrictor=LoadRestrictionsNone
+secretGenerator:
+  - name: cosign-public-key
+    namespace: kyverno
+    files:
+      - cosign.pub=../../security/keys/cosign.pub
+    options:
+      disableNameSuffixHash: true

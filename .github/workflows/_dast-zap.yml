@@ -1,0 +1,64 @@
+name: DAST - OWASP ZAP Baseline
+
+on:
+  workflow_call:
+    inputs:
+      module:
+        description: Maven module name (e.g. auth-service)
+        required: true
+        type: string
+      port:
+        description: HTTP port the service listens on
+        required: true
+        type: number
+      java-version:
+        required: false
+        type: string
+        default: "17"
+
+permissions:
+  contents: read
+
+jobs:
+  zap:
+    name: ${{ inputs.module }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ inputs.java-version }}
+          cache: maven
+      - name: Download service JARs
+        uses: actions/download-artifact@v4
+        with:
+          name: service-jars
+      - name: Start ${{ inputs.module }}
+        run: |
+          mkdir -p reports
+          nohup java -jar ${{ inputs.module }}/target/${{ inputs.module }}-*.jar \
+            > reports/${{ inputs.module }}.log 2>&1 &
+          for i in {1..30}; do
+            curl -fsS http://127.0.0.1:${{ inputs.port }}/actuator/health >/dev/null \
+              && echo "${{ inputs.module }} is up." && break
+            sleep 2
+          done
+      - name: Run ZAP baseline scan
+        run: |
+          docker run --rm --network host \
+            -v "${PWD}/reports:/zap/wrk:rw" \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py -t http://127.0.0.1:${{ inputs.port }} \
+            -J zap-${{ inputs.module }}.json \
+            -w zap-${{ inputs.module }}.md \
+            -r zap-${{ inputs.module }}.html \
+            -m 3 || true
+      - if: always()
+        run: pkill -f "${{ inputs.module }}" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-reports-dast-${{ inputs.module }}
+          path: reports
+          if-no-files-found: warn

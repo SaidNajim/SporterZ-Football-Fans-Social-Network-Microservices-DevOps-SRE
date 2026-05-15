@@ -26,7 +26,6 @@ if [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]]; then
     kubectl delete -f auth-service.yaml --ignore-not-found=true
     kubectl delete -f envoy-extension-policy.yaml --ignore-not-found=true
     kubectl delete -f envoy-gateway.yaml --ignore-not-found=true
-    kubectl delete -f kyverno-verify-signed-images.yaml --ignore-not-found=true
     kubectl delete -f kafka-single-node.yaml --ignore-not-found=true
     kubectl delete -f prometheus-config.yaml --ignore-not-found=true
     kubectl delete -f prometheus.yaml --ignore-not-found=true

@@ -10,30 +10,49 @@ spec:
         elements:
           - appName: core
             namespace: default
+            path: k8s
             include: "{auth-service.yaml,posts-service.yaml,match-service.yaml,messaging-service.yaml,api-gateway.yaml,frontend.yaml}"
           - appName: gateway
             namespace: default
+            path: k8s
             include: "{envoy-gateway.yaml,envoy-extension-policy.yaml}"
           - appName: kafka
             namespace: kafka
+            path: k8s
             include: "kafka-single-node.yaml"
           - appName: monitoring
             namespace: default
+            path: k8s
             include: "{prometheus-config.yaml,prometheus.yaml,grafana.yaml}"
+          - appName: security
+            namespace: kyverno
+            path: k8s/security-overlay
+            kustomize: true
+            buildOptions: "--load-restrictor LoadRestrictionsNone"
   template:
     metadata:
       name: sporterz-{{.appName}}
       labels:
         app.kubernetes.io/part-of: sporterz
+      {{- if eq .appName "core"}}
+      annotations:
+        argocd-image-updater.argoproj.io/image-list: "auth=mrxmoon/sporterz-auth-service, gateway=mrxmoon/sporterz-api-gateway, posts=mrxmoon/sporterz-posts-service, match=mrxmoon/sporterz-match-service, messaging=mrxmoon/sporterz-messaging-service"
+        argocd-image-updater.argoproj.io/update-strategy: "sha"
+      {{- end}}
     spec:
       project: sporterz
       source:
         repoURL: https://github.com/SaidNajim/SporterZ-Football-Fans-Social-Network-Microservices-DevOps-SRE
         targetRevision: main
-        path: k8s
+        path: "{{.path}}"
+        {{- if .kustomize}}
+        kustomize:
+          buildOptions: "{{.buildOptions}}"
+        {{- else}}
         directory:
           recurse: false
           include: "{{.include}}"
+        {{- end}}
       destination:
         server: https://kubernetes.default.svc
         namespace: "{{.namespace}}"

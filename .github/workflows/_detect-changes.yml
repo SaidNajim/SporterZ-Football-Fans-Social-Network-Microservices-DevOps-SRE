@@ -1,0 +1,49 @@
+name: Detect Changed Services
+
+on:
+  workflow_call:
+    outputs:
+      auth-service:
+        value: ${{ jobs.filter.outputs.auth-service }}
+      api-gateway:
+        value: ${{ jobs.filter.outputs.api-gateway }}
+      posts-service:
+        value: ${{ jobs.filter.outputs.posts-service }}
+      match-service:
+        value: ${{ jobs.filter.outputs.match-service }}
+      messaging-service:
+        value: ${{ jobs.filter.outputs.messaging-service }}
+
+permissions:
+  contents: read
+
+jobs:
+  filter:
+    runs-on: ubuntu-latest
+    outputs:
+      auth-service:      ${{ steps.filter.outputs.auth-service }}
+      api-gateway:       ${{ steps.filter.outputs.api-gateway }}
+      posts-service:     ${{ steps.filter.outputs.posts-service }}
+      match-service:     ${{ steps.filter.outputs.match-service }}
+      messaging-service: ${{ steps.filter.outputs.messaging-service }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            auth-service:
+              - 'auth-service/**'
+              - 'pom.xml'
+            api-gateway:
+              - 'api-gateway/**'
+              - 'pom.xml'
+            posts-service:
+              - 'posts-service/**'
+              - 'pom.xml'
+            match-service:
+              - 'match-service/**'
+              - 'pom.xml'
+            messaging-service:
+              - 'messaging-service/**'
+              - 'pom.xml'

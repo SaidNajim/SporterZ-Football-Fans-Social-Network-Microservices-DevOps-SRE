@@ -1,4 +1,4 @@
-# SporterZ DevOps/SRE 
+# SporterZ DevOps/SRE
 
 <p align="leftS">
   <img src="https://i.ibb.co/vj7xmFZ/logo.png" alt="SporterZ logo" width="120">
@@ -29,6 +29,47 @@
 - Argo CD GitOps bootstrap:
   - Project + ApplicationSet
 - Docker image automation script: `build-and-push.sh`
+
+## Security (DevSecOps MVP)
+
+Security controls are centralized in this repository and in the main pipeline
+`.github/workflows/devsecops-pipeline.yml`.
+
+Coverage includes:
+
+- Secret scanning in local commits via `pre-commit` (`detect-secrets`)
+- Snyk scans in CI:
+  - Open Source dependency scanning (SCA)
+  - Source code scanning (Snyk Code)
+  - Container image scanning
+  - Infrastructure as Code scanning
+- Compliance-as-code checks using Conftest + OPA Rego policies in
+  `security/policies/`
+- Aggregated gate evaluation with `security/scripts/security_gate.py`
+
+Required GitHub repository secrets:
+
+- `SNYK_TOKEN`
+- `SNYK_ORG` (optional)
+
+Snyk results are sent to:
+
+- Snyk dashboard (`snyk monitor`)
+- GitHub Security tab (SARIF upload)
+
+Local developer setup:
+
+```bash
+pip install pre-commit
+pre-commit install
+pre-commit run --all-files
+```
+
+Run compliance policies locally:
+
+```bash
+conftest test k8s/*.yaml --policy security/policies --output table
+```
 
 ---
 
@@ -126,11 +167,12 @@ What `deploy.sh` does:
 4. Deploys microservices
 5. Optionally installs Gateway API + Envoy Gateway
 6. Applies Envoy Gateway route and Coraza WAF policy
-7. Pins Envoy data plane service to NodePort `30080`
-8. Deploys Prometheus + Grafana
-9. Installs/updates Argo CD in `argocd` namespace
-10. Applies `AppProject` + `ApplicationSet` linked to this repository
-11. Waits for main workloads rollout
+7. Optionally installs Kyverno and applies signed-image verification policy
+8. Pins Envoy data plane service to NodePort `30080`
+9. Deploys Prometheus + Grafana
+10. Installs/updates Argo CD in `argocd` namespace
+11. Applies `AppProject` + `ApplicationSet` linked to this repository
+12. Waits for main workloads rollout
 
 ### Deployment toggles
 
@@ -139,6 +181,7 @@ You can enable/disable parts with environment variables:
 - `DEPLOY_KAFKA=true|false`
 - `DEPLOY_MESSAGING=true|false`
 - `DEPLOY_ENVOY_WAF=true|false`
+- `DEPLOY_KYVERNO=true|false`
 - `DEPLOY_ARGOCD=true|false`
 - `ENVOY_NODEPORT=<port>` (default `30080`)
 
@@ -146,7 +189,7 @@ Examples:
 
 ```bash
 # Full stack (default behavior)
-DEPLOY_KAFKA=true DEPLOY_MESSAGING=true DEPLOY_ENVOY_WAF=true DEPLOY_ARGOCD=true ./deploy.sh
+DEPLOY_KAFKA=true DEPLOY_MESSAGING=true DEPLOY_ENVOY_WAF=true DEPLOY_KYVERNO=true DEPLOY_ARGOCD=true ./deploy.sh
 
 # Without Kafka + messaging
 DEPLOY_KAFKA=false DEPLOY_MESSAGING=false ./deploy.sh
@@ -158,6 +201,7 @@ PowerShell equivalent (when launching bash from PowerShell):
 $env:DEPLOY_KAFKA="true"
 $env:DEPLOY_MESSAGING="true"
 $env:DEPLOY_ENVOY_WAF="true"
+$env:DEPLOY_KYVERNO="true"
 $env:DEPLOY_ARGOCD="true"
 bash ./deploy.sh
 ```
@@ -222,9 +266,6 @@ kubectl port-forward svc/grafana 3000:3000
 ```
 
 - URL: [http://localhost:3000](http://localhost:3000)
-- Default credentials:
-  - User: `admin`
-  - Password: `admin`
 
 Prometheus datasource URL in Grafana (inside cluster):
 
@@ -246,6 +287,7 @@ From `k8s/`:
 ./logs.sh api-gateway
 ./logs.sh frontend
 ./logs.sh kafka
+./logs.sh kyverno
 ```
 
 ## Common kubectl debug commands
@@ -284,6 +326,8 @@ cd k8s
 This script interactively asks whether to:
 
 - delete Kubernetes resources
+- delete Argo CD namespace
+- uninstall Kyverno controller + namespace
 - delete Kind cluster `sporterz`
 
 ---
@@ -303,6 +347,10 @@ Gateway + WAF:
 
 - `k8s/envoy-gateway.yaml`
 - `k8s/envoy-extension-policy.yaml`
+
+Kyverno:
+
+- `k8s/security-overlay/kyverno-verify-signed-images.yaml`
 
 Kafka:
 
@@ -325,7 +373,6 @@ Cluster config:
 
 Operational scripts:
 
-- `build-and-push.sh`
 - `k8s/deploy.sh`
 - `k8s/status.sh`
 - `k8s/logs.sh`
@@ -336,9 +383,6 @@ Operational scripts:
 ## One-Page Command Cheat Sheet
 
 ```bash
-# From repo root
-./build-and-push.sh --build
-
 cd k8s
 ./deploy.sh
 ./status.sh

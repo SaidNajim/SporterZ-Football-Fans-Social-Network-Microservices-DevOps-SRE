@@ -1,0 +1,48 @@
+name: Enforce Security Gate
+
+on:
+  workflow_call:
+    inputs:
+      max-critical:
+        required: false
+        type: string
+        default: "0"
+      max-high:
+        required: false
+        type: string
+        default: "0"
+      max-medium:
+        required: false
+        type: string
+        default: "999999"
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: mkdir -p reports
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: security-reports-*
+          path: reports
+          merge-multiple: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Enforce severity gate
+        env:
+          SECURITY_REPORTS_DIR: reports
+          MAX_CRITICAL: ${{ inputs.max-critical }}
+          MAX_HIGH:     ${{ inputs.max-high }}
+          MAX_MEDIUM:   ${{ inputs.max-medium }}
+        run: python security/scripts/security_gate.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-reports-consolidated
+          path: reports
+          if-no-files-found: warn

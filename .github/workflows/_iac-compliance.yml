@@ -1,0 +1,41 @@
+name: IaC and Compliance
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  iac-compliance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: mkdir -p reports
+      - uses: aquasecurity/trivy-action@0.24.0
+        with:
+          scan-type: config
+          scan-ref: k8s
+          format: json
+          output: reports/trivy-config.json
+          severity: CRITICAL,HIGH,MEDIUM,LOW
+          exit-code: 0
+      - uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: k8s
+          soft_fail: true
+          quiet: true
+          output_format: json
+          output_file_path: reports/checkov.json
+      - name: Conftest compliance checks
+        run: |
+          curl -sSL -o conftest.tar.gz https://github.com/open-policy-agent/conftest/releases/download/v0.56.0/conftest_0.56.0_Linux_x86_64.tar.gz
+          tar -xzf conftest.tar.gz conftest && sudo mv conftest /usr/local/bin/conftest
+          conftest test k8s/*.yaml --policy security/policies --output table || true
+          conftest test k8s/*.yaml --policy security/policies --output json > reports/conftest.json || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-reports-iac
+          path: reports
+          if-no-files-found: warn

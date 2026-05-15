@@ -1,0 +1,44 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-signed-sporterz-images
+  annotations:
+    policies.kyverno.io/title: Verify signed SporterZ images
+    policies.kyverno.io/category: Supply Chain Security
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/subject: Pod
+spec:
+  validationFailureAction: Enforce
+  background: false
+  rules:
+    - name: verify-cosign-signature
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      verifyImages:
+        - imageReferences:
+            - "mrxmoon/sporterz-*"
+          mutateDigest: false
+          required: true
+          verifyDigest: false
+          attestors:
+            - entries:
+                - keys:
+                    secret:
+                      name: cosign-public-key
+                      namespace: kyverno
+    - name: block-unknown-images
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        pattern:
+          spec:
+            containers:
+              - image: "mrxmoon/sporterz-* | prom/prometheus:v2.44.0 | grafana/grafana:10.0.0"
+            initContainers:
+              - image: "mrxmoon/sporterz-* | prom/prometheus:v2.44.0 | grafana/grafana:10.0.0"

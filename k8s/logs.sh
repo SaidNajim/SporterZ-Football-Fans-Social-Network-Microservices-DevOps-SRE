@@ -20,6 +20,8 @@ if [ -z "$SERVICE" ]; then
     echo "  frontend"
     echo "  kafka"
     echo "  kyverno"
+    echo "  argocd"
+    echo "  argocd-image-updater"
     exit 1
 fi
 
@@ -48,6 +50,16 @@ case $SERVICE in
     kyverno)
         echo "Showing logs for kyverno-admission-controller (follow mode, Ctrl+C to exit)..."
         kubectl logs -f -n kyverno deploy/kyverno-admission-controller --tail=100
+        exit 0
+        ;;
+    argocd)
+        echo "Showing logs for ArgoCD server (follow mode, Ctrl+C to exit)..."
+        kubectl logs -f -n argocd deploy/argocd-server --tail=100
+        exit 0
+        ;;
+    argocd-image-updater)
+        echo "Showing logs for ArgoCD Image Updater (follow mode, Ctrl+C to exit)..."
+        kubectl logs -f -n argocd deploy/argocd-image-updater --tail=100
         exit 0
         ;;
     *)

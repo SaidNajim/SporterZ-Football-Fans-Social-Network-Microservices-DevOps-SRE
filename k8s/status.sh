@@ -42,6 +42,9 @@ if kubectl get namespace argocd >/dev/null 2>&1; then
     kubectl get pods -n argocd
     kubectl get applicationsets.argoproj.io -n argocd 2>/dev/null || echo "   no ApplicationSets found"
     kubectl get applications.argoproj.io -n argocd 2>/dev/null || echo "   no Applications found"
+    echo ""
+    echo "ArgoCD Image Updater:"
+    kubectl get deploy/argocd-image-updater -n argocd 2>/dev/null || echo "   argocd-image-updater not found"
 else
     echo "   argocd namespace not found"
 fi

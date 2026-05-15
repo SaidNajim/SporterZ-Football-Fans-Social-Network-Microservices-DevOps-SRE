@@ -1,0 +1,50 @@
+name: Snyk Security Center
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  snyk:
+    runs-on: ubuntu-latest
+    env:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      SNYK_ORG:   ${{ secrets.SNYK_ORG }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: snyk/actions/setup@master
+      - name: Snyk OSS, Code and IaC scans
+        run: |
+          mkdir -p reports
+          snyk auth "${SNYK_TOKEN}"
+          snyk test --all-projects --severity-threshold=low \
+            --json-file-output=reports/snyk-oss.json --sarif-file-output=reports/snyk-oss.sarif || true
+          snyk code test --severity-threshold=low \
+            --json-file-output=reports/snyk-code.json --sarif-file-output=reports/snyk-code.sarif || true
+          snyk iac test k8s --severity-threshold=low \
+            --json-file-output=reports/snyk-iac.json --sarif-file-output=reports/snyk-iac.sarif || true
+          if [ -n "${SNYK_ORG}" ]; then snyk monitor --all-projects --org="${SNYK_ORG}" || true
+          else snyk monitor --all-projects || true; fi
+      - name: Upload Snyk SARIF results
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for category in snyk-oss snyk-code snyk-iac; do
+            file="reports/${category}.sarif"
+            [ -f "$file" ] || continue
+            gh api repos/${{ github.repository }}/code-scanning/sarifs \
+              --method POST \
+              --field ref="${{ github.ref }}" \
+              --field commit_sha="${{ github.sha }}" \
+              --field sarif="$(gzip -c "$file" | base64 -w0)" \
+              --field category="$category"
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-reports-snyk
+          path: reports
+          if-no-files-found: warn
