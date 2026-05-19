@@ -1,0 +1,30 @@
+title = "Gitleaks Config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Allowlist for test secrets and false positives"
+
+# Allowlist specific files
+paths = [
+    '''auth-service/src/test/java/com/example/Auth/JwtServiceTest.java''',
+    '''auth-service/src/main/java/com/example/Auth/services/JwtService.java''',
+    '''\.secrets\.baseline''',
+    '''\\.secrets\.baseline''',
+    '''.gitleaks.toml''',
+]
+
+# Allowlist specific regex patterns (test keys, default passwords)
+regexes = [
+    # H2 default password
+    '''password''',
+    # Test JWT secret key (hex string)
+    '''10040A2526072B667C02EE4AE6A75D115E7F7E02573892D5BD3C4A9E9B2B4C3AFF868172859CFC44B72360563C8BA66D''', # pragma: allowlist secret
+    # Allow pragma comments
+    '''pragma:\s*allowlist''',
+    '''pragma:\s*allowlist secret''',
+]
+
+# Allowlist specific commits (if needed)
+commits = []
