@@ -37,7 +37,7 @@ Security controls are centralized in this repository and in the main pipeline
 
 Coverage includes:
 
-- Secret scanning in local commits via `pre-commit` (`detect-secrets`)
+- Secret scanning in local commits via `pre-commit` (`detect-secrets`) — config in `security/secret-scanning/`
 - Snyk scans in CI:
   - Open Source dependency scanning (SCA)
   - Source code scanning (Snyk Code)
@@ -46,6 +46,7 @@ Coverage includes:
 - Compliance-as-code checks using Conftest + OPA Rego policies in
   `security/policies/`
 - Aggregated gate evaluation with `security/scripts/security_gate.py`
+- Gitleaks / detect-secrets / pre-commit configs in `security/secret-scanning/`
 
 Required GitHub repository secrets:
 
@@ -61,8 +62,8 @@ Local developer setup:
 
 ```bash
 pip install pre-commit
-pre-commit install
-pre-commit run --all-files
+./security/secret-scanning/install-pre-commit.sh
+pre-commit run --config security/secret-scanning/.pre-commit-config.yaml --all-files
 ```
 
 Run compliance policies locally:

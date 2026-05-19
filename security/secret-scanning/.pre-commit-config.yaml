@@ -15,5 +15,11 @@ repos:
     rev: v1.5.0
     hooks:
       - id: detect-secrets
-        args: ["--baseline", ".secrets.baseline"]
+        args:
+          - --baseline
+          - security/secret-scanning/.secrets.baseline
+          # Baseline in a subdir breaks detect-secrets is_baseline_file; exclude explicitly.
+          - --exclude-files
+          - (?i).*\.secrets\.baseline$
+        exclude: (?i).*\.secrets\.baseline$
         additional_dependencies: ['urllib3==1.26.18']

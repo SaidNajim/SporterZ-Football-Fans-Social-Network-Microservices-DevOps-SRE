@@ -10,9 +10,8 @@ description = "Allowlist for test secrets and false positives"
 paths = [
     '''auth-service/src/test/java/com/example/Auth/JwtServiceTest.java''',
     '''auth-service/src/main/java/com/example/Auth/services/JwtService.java''',
-    '''\.secrets\.baseline''',
-    '''\\.secrets\.baseline''',
-    '''.gitleaks.toml''',
+    '''security/secret-scanning/\.secrets\.baseline''',
+    '''security/secret-scanning/\.gitleaks\.toml''',
 ]
 
 # Allowlist specific regex patterns (test keys, default passwords)
