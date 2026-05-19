@@ -24,8 +24,11 @@ if [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]]; then
     kubectl delete -f match-service.yaml --ignore-not-found=true
     kubectl delete -f posts-service.yaml --ignore-not-found=true
     kubectl delete -f auth-service.yaml --ignore-not-found=true
+    kubectl delete -f envoy-rate-limit-policy.yaml --ignore-not-found=true
     kubectl delete -f envoy-extension-policy.yaml --ignore-not-found=true
     kubectl delete -f envoy-gateway.yaml --ignore-not-found=true
+    kubectl delete -f envoy-gateway-ratelimit-config.yaml --ignore-not-found=true
+    kubectl delete -f redis-rate-limit.yaml --ignore-not-found=true
     kubectl delete -f kafka-single-node.yaml --ignore-not-found=true
     kubectl delete -f prometheus-config.yaml --ignore-not-found=true
     kubectl delete -f prometheus.yaml --ignore-not-found=true

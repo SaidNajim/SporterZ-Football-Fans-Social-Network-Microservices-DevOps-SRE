@@ -25,6 +25,8 @@ echo "Gateway + WAF:"
 kubectl get gateway sporterz-gateway 2>/dev/null || echo "   sporterz-gateway not found"
 kubectl get httproute api-gateway-route 2>/dev/null || echo "   api-gateway-route not found"
 kubectl get envoyextensionpolicy coraza-waf-poc 2>/dev/null || echo "   coraza-waf-poc not found"
+kubectl get backendtrafficpolicy rate-limit-policy 2>/dev/null || echo "   rate-limit-policy not found"
+kubectl get pods -n redis-system 2>/dev/null || echo "   redis-system not found"
 kubectl get svc -n envoy-gateway-system -l gateway.envoyproxy.io/owning-gateway-name=sporterz-gateway -o wide 2>/dev/null || echo "   envoy data-plane service not found"
 
 echo ""

@@ -58,6 +58,17 @@ configure_envoy_nodeport() {
   echo -e "${GREEN}Envoy service ${svc} is pinned to NodePort ${ENVOY_NODEPORT}${NC}"
 }
 
+bootstrap_envoy_rate_limit() {
+  echo -e "${YELLOW}Installing Redis for Envoy global rate limiting...${NC}"
+  kubectl apply -f redis-rate-limit.yaml
+  wait_rollout "redis" "redis-system"
+
+  echo -e "${YELLOW}Enabling global rate limit in Envoy Gateway (Redis backend)...${NC}"
+  kubectl apply -f envoy-gateway-ratelimit-config.yaml
+  kubectl rollout restart deployment/envoy-gateway -n envoy-gateway-system
+  wait_rollout "envoy-gateway" "envoy-gateway-system"
+}
+
 bootstrap_argocd() {
   if [[ "${DEPLOY_KAFKA}" != "true" || "${DEPLOY_MESSAGING}" != "true" || "${DEPLOY_ENVOY_WAF}" != "true" ]]; then
     echo -e "${YELLOW}Note: Argo CD ApplicationSet manages the full stack manifests and may reconcile resources even when DEPLOY_* toggles are set to false.${NC}"
@@ -148,10 +159,14 @@ if [[ "${DEPLOY_ENVOY_WAF}" == "true" ]]; then
   fi
   kubectl get crd gateways.gateway.networking.k8s.io >/dev/null
   kubectl get crd envoyextensionpolicies.gateway.envoyproxy.io >/dev/null
+  kubectl get crd backendtrafficpolicies.gateway.envoyproxy.io >/dev/null
   wait_rollout "envoy-gateway" "envoy-gateway-system"
 
-  echo -e "${YELLOW}Applying Gateway route + Coraza WAF policy...${NC}"
+  bootstrap_envoy_rate_limit
+
+  echo -e "${YELLOW}Applying Gateway route, rate limit policy, and Coraza WAF...${NC}"
   kubectl apply -f envoy-gateway.yaml
+  kubectl apply -f envoy-rate-limit-policy.yaml
   kubectl apply -f envoy-extension-policy.yaml
   configure_envoy_nodeport
 else
@@ -200,6 +215,8 @@ echo ""
 echo "Useful checks:"
 echo "  - kubectl get svc -n envoy-gateway-system"
 echo "  - kubectl get envoyextensionpolicy coraza-waf-poc"
+echo "  - kubectl get backendtrafficpolicy rate-limit-policy"
+echo "  - kubectl get pods -n redis-system"
 echo "  - kubectl get clusterpolicy verify-signed-sporterz-images"
 echo "  - kubectl get pods -n ${KYVERNO_NAMESPACE}"
 echo "  - kubectl get pods"

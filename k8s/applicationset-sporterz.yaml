@@ -15,7 +15,15 @@ spec:
           - appName: gateway
             namespace: default
             path: k8s
-            include: "{envoy-gateway.yaml,envoy-extension-policy.yaml}"
+            include: "{envoy-gateway.yaml,envoy-extension-policy.yaml,envoy-rate-limit-policy.yaml}"
+          - appName: redis-ratelimit
+            namespace: redis-system
+            path: k8s
+            include: "redis-rate-limit.yaml"
+          - appName: envoy-ratelimit-config
+            namespace: envoy-gateway-system
+            path: k8s
+            include: "envoy-gateway-ratelimit-config.yaml"
           - appName: kafka
             namespace: kafka
             path: k8s

@@ -1,0 +1,28 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: rate-limit-policy
+  namespace: default
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: api-gateway-route
+  rateLimit:
+    type: Global
+    global:
+      rules:
+        - clientSelectors:
+            - headers:
+                - type: Distinct
+                  name: x-user-id
+          limit:
+            requests: 100
+            unit: Minute
+        - clientSelectors:
+            - sourceCIDR:
+                type: Distinct
+                value: 0.0.0.0/0
+          limit:
+            requests: 100
+            unit: Minute
