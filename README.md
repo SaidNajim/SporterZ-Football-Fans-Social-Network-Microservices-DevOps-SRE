@@ -28,7 +28,7 @@
   - Coraza WAF policy (`k8s/envoy-extension-policy.yaml`)
 - Argo CD GitOps bootstrap:
   - Project + ApplicationSet
-- Docker image automation script: `build-and-push.sh`
+- CI/CD container build & sign pipeline: `.github/workflows/devsecops-pipeline.yml`
 
 ## Security (DevSecOps MVP)
 
@@ -99,14 +99,12 @@ Also make sure:
 From repository root:
 
 ```bash
-# 1) Build and push backend images (includes Maven build)
-./build-and-push.sh --build
-
-# 2) Deploy everything (cluster + services + gateway + monitoring + Argo CD)
+# Deploy everything (cluster + services + gateway + monitoring + Argo CD)
+# Container images are built, scanned, and signed automatically in the DevSecOps CI/CD pipeline
 cd k8s
 ./deploy.sh
 
-# 3) Validate cluster
+# Validate cluster
 ./status.sh
 ```
 
@@ -125,30 +123,32 @@ git clone <YOUR_REPO_URL>
 cd SporterZ-DevOps-SRE
 ```
 
-## 2) Build and push Docker images
+## 2) Container Image Build & Push (DevSecOps Pipeline)
 
-Script used: `build-and-push.sh`
+Container image building, vulnerability scanning (Trivy + Snyk), and image signing (Cosign) are handled automatically by the GitHub Actions DevSecOps pipeline ([devsecops-pipeline.yml](file:///c:/Users/Dell%20XPS/Documents/GitHub/SporterZ-DevOps-SRE/.github/workflows/devsecops-pipeline.yml) using [_container-build-sign.yml](file:///c:/Users/Dell%20XPS/Documents/GitHub/SporterZ-DevOps-SRE/.github/workflows/_container-build-sign.yml)).
+
+Images built, signed, and pushed to Docker Hub:
+
+- `sporterz-auth-service`
+- `sporterz-posts-service`
+- `sporterz-match-service`
+- `sporterz-messaging-service`
+- `sporterz-api-gateway`
+
+For local building or manual testing:
 
 ```bash
-# Uses existing JARs in each service target/ directory
-./build-and-push.sh
+# Build JAR for a service locally
+mvn -pl auth-service -am clean package -DskipTests
 
-# Builds JARs first (recommended)
-./build-and-push.sh --build
+# Build Docker image locally
+docker build -t mrxmoon/sporterz-auth-service:latest auth-service
 ```
-
-What this script currently builds/pushes:
-
-- `mrxmoon/sporterz-auth-service:latest`
-- `mrxmoon/sporterz-posts-service:latest`
-- `mrxmoon/sporterz-match-service:latest`
-- `mrxmoon/sporterz-messaging-service:latest`
-- `mrxmoon/sporterz-api-gateway:latest`
 
 Notes:
 
-- The script logs into Docker Hub interactively.
-- `frontend` image is referenced in Kubernetes as `mrxmoon/sporterz-frontend:latest`, but is not built by `build-and-push.sh`.
+- Docker Hub credentials and Cosign signing keys are managed via GitHub Secrets in the pipeline (`DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`, `COSIGN_PRIVATE_KEY`).
+- `frontend` image is referenced in Kubernetes as `mrxmoon/sporterz-frontend:latest`.
 - If you change frontend code, build/push that image separately or update `k8s/frontend.yaml` to your own image.
 
 ## 3) Deploy to Kind Kubernetes
@@ -194,18 +194,6 @@ DEPLOY_KAFKA=true DEPLOY_MESSAGING=true DEPLOY_ENVOY_WAF=true DEPLOY_KYVERNO=tru
 
 # Without Kafka + messaging
 DEPLOY_KAFKA=false DEPLOY_MESSAGING=false ./deploy.sh
-```
-
-PowerShell equivalent (when launching bash from PowerShell):
-
-```powershell
-$env:DEPLOY_KAFKA="true"
-$env:DEPLOY_MESSAGING="true"
-$env:DEPLOY_ENVOY_WAF="true"
-$env:DEPLOY_KYVERNO="true"
-$env:DEPLOY_ARGOCD="true"
-bash ./deploy.sh
-```
 
 ### Argo CD install command used by `deploy.sh`
 
