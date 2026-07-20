@@ -78,21 +78,29 @@ def count_dependency_check(path: Path, counter: Counter) -> None:
         add(counter, severity)
 
 
-def walk_snyk_severity(obj: Any, counter: Counter) -> None:
-    if isinstance(obj, dict):
-        for key, value in obj.items():
-            if key.lower() == "severity" and isinstance(value, str):
-                add(counter, value)
-            else:
-                walk_snyk_severity(value, counter)
-    elif isinstance(obj, list):
-        for item in obj:
-            walk_snyk_severity(item, counter)
-
-
 def count_snyk(path: Path, counter: Counter) -> None:
     payload = load_json(path)
-    walk_snyk_severity(payload, counter)
+    # Snyk outputs include metadata fields that also contain "severity" labels.
+    # Count only actionable issues to avoid inflating totals.
+    if isinstance(payload, list):
+        for item in payload:
+            if not isinstance(item, dict):
+                continue
+            for vuln in item.get("vulnerabilities", []) or []:
+                if isinstance(vuln, dict):
+                    add(counter, str(vuln.get("severity", "Low")))
+            for issue in item.get("infrastructureAsCodeIssues", []) or []:
+                if isinstance(issue, dict):
+                    add(counter, str(issue.get("severity", "Low")))
+        return
+
+    if isinstance(payload, dict):
+        for vuln in payload.get("vulnerabilities", []) or []:
+            if isinstance(vuln, dict):
+                add(counter, str(vuln.get("severity", "Low")))
+        for issue in payload.get("infrastructureAsCodeIssues", []) or []:
+            if isinstance(issue, dict):
+                add(counter, str(issue.get("severity", "Low")))
 
 
 def main() -> int:
