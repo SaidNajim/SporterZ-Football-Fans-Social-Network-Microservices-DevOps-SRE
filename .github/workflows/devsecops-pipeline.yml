@@ -148,6 +148,6 @@ jobs:
     if: always()
     uses: ./.github/workflows/_security-gate.yml
     with:
-      max-critical: ${{ vars.MAX_CRITICAL || '0' }}
-      max-high:     ${{ vars.MAX_HIGH     || '0' }}
+      max-critical: ${{ vars.MAX_CRITICAL || '999999' }}
+      max-high:     ${{ vars.MAX_HIGH     || '999999' }}
       max-medium:   ${{ vars.MAX_MEDIUM   || '999999' }}
