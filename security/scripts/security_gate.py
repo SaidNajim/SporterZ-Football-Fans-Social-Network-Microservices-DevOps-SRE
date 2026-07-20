@@ -5,7 +5,10 @@ from __future__ import annotations
 
 import json
 import os
-import xml.etree.ElementTree as ET
+try:
+    import defusedxml.ElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
 from collections import Counter
 from pathlib import Path
 from typing import Any

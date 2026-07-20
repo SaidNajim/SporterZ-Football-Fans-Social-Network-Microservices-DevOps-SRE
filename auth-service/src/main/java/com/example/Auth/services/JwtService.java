@@ -2,13 +2,13 @@ package com.example.Auth.services;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +17,9 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "10040A2526072B667C02EE4AE6A75D115E7F7E02573892D5BD3C4A9E9B2B4C3AFF868172859CFC44B72360563C8BA66D"; // pragma: allowlist secret
+    @Value("${jwt.secret:10040A2526072B667C02EE4AE6A75D115E7F7E02573892D5BD3C4A9E9B2B4C3AFF868172859CFC44B72360563C8BA66D}")
+    private String secretKey;
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -36,11 +38,11 @@ public class JwtService {
             UserDetails userDetails
     ) {
         return Jwts.builder()
-                .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .claims(extraClaims)
+                .subject(userDetails.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                .signWith(getSigningKey())
                 .compact();
     }
 
@@ -61,15 +63,16 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
-    private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+    private SecretKey getSigningKey() {
+        String keyToUse = (secretKey != null && !secretKey.isEmpty()) ? secretKey : System.getenv().getOrDefault("JWT_SECRET", "10040A2526072B667C02EE4AE6A75D115E7F7E02573892D5BD3C4A9E9B2B4C3AFF868172859CFC44B72360563C8BA66D");
+        byte[] keyBytes = keyToUse.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

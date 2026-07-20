@@ -54,11 +54,11 @@ class JwtServiceTest {
         assertNotNull(token);
         assertTrue(token.length() > 0);
 
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+        Claims claims = Jwts.parser()
+                .verifyWith((javax.crypto.SecretKey) getSigningKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
 
         assertEquals(TEST_USERNAME, claims.getSubject());
         assertEquals("admin", claims.get("role"));
@@ -85,7 +85,7 @@ class JwtServiceTest {
     }
 
     private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = SECRET_KEY.getBytes(java.nio.charset.StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
