@@ -22,16 +22,19 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
             <version>4.3.1</version>
+            <version>4.1.7</version>
         </dependency>
         <dependency>
             <groupId>net.minidev</groupId>
             <artifactId>json-smart</artifactId>
+            <version>2.5.1</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>7.7.1</version>
-            <scope>test</scope> </dependency>
+            <version>7.10.2</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

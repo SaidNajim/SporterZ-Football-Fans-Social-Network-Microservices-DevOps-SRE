@@ -15,9 +15,26 @@ spec:
       labels:
         app: messaging-service
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
       containers:
         - name: messaging-service
           image: mrxmoon/sporterz-messaging-service:main  # Placeholder - ArgoCD Image Updater will set to commit SHA
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
           ports:
             - containerPort: 8083
           env:
