@@ -84,17 +84,11 @@ jobs:
             --sarif-file-output=reports/snyk-container-${{ inputs.module }}.sarif || true
 
       - name: Upload Snyk container SARIF
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          file="reports/snyk-container-${{ inputs.module }}.sarif"
-          [ -f "$file" ] || exit 0
-          gh api repos/${{ github.repository }}/code-scanning/sarifs \
-            --method POST \
-            --field ref="${{ github.ref }}" \
-            --field commit_sha="${{ github.sha }}" \
-            --field sarif="$(gzip -c "$file" | base64 -w0)" \
-            --field category="snyk-container-${{ inputs.module }}"
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: reports/snyk-container-${{ inputs.module }}.sarif
+          category: snyk-container-${{ inputs.module }}
 
       - uses: sigstore/cosign-installer@v3.6.0
 
