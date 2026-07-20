@@ -30,11 +30,12 @@ public class KafkaController {
     @PostMapping("create-topic")
     public ResponseEntity<String> createTopic(@RequestParam String topicName) {
         NewTopic newTopic = new NewTopic(topicName, 1, (short) 1);
+        String safeTopicName = org.springframework.web.util.HtmlUtils.htmlEscape(topicName);
         try {
             adminClient.createTopics(Collections.singleton(newTopic)).all().get();
-            return ResponseEntity.status(HttpStatus.CREATED).body("Topic created successfully: " + topicName);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Topic created successfully: " + safeTopicName);
         } catch (InterruptedException | ExecutionException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create topic: " + topicName);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create topic: " + safeTopicName);
         }
     }
 }
